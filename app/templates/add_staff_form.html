@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/util.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container pt-3">
+        <div class="container mt-5">
+            <div class="border border-dark rounded p-3 m-5">
+                <form id="form_add_staff">
+                    <legend class="mb-3">Добавить сотрудника</legend>
+                    <div class="mb-3">
+                        <label for="staff_name" class="form-label">ФИО сотрудника</label>
+                        <input type="text" id="staff_name" class="form-control" placeholder="Введите ФИО:" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="choice_post" class="form-label">Должность</label>
+                        <select name="choice_select_post" id="choice_post" onclick="GFG_Fun(this.value)">
+                            <!-- Здесь будут данные из БД -->
+                        </select>
+                    </div>
+                    <div id="hide_div" class="mb-3">
+                        <input type="text" id="posts_name" class="form-control"
+                               placeholder="Введите название должности:">
+                    </div>
+
+                    <div>
+                        <input type="button" value="Сохранить" class="btn btn-dark" onclick="add_staff_in_db()">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts_down %}
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/add_staff_form.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/util.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <table class="table table-striped table-hover" id="table_execute_orders">
+            <caption>Таблица исполнения заказов</caption>
+            <thead>
+            <tr>
+                <th scope="col">#Номер заказа</th>
+                <th scope="col">Заказчик</th>
+                <th scope="col">Тип ремонта</th>
+                <th scope="col">Стоимость ремонта</th>
+                <th scope="col">Дата исполнения заказа</th>
+                <th scope="col">Сообщение о выполненной работе</th>
+                <th scope="col">Дата получения товара</th>
+                <th scope="col">Общая стоимость(с учетом гарантии)</th>
+                <th scope="col">Действие</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <!-- Сюда будут вставляться строки с ячейками -->
+
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block scripts_down %}
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/table_execute_orders.js') }}"></script>
+{% endblock %}

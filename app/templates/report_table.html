@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/util.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container pt-3">
+        <div class="container mt-5">
+            <div class="border border-dark rounded p-3 m-5">
+                <form id="form_add_staff">
+                    <legend class="mb-3">Введите дату</legend>
+                    <div class="mb-3">
+                        <label for="staff_name" class="form-label">Месяц (число от 1 до 12)</label>
+                        <input type="text" id="staff_name" class="form-control" placeholder="Введите месяц:" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="choice_post" class="form-label">Год</label>
+                        <input type="text" id="choice_post" class="form-control" placeholder="Введите год:" required>
+                    </div>
+
+                    <div>
+                        <input type="button" value="Создать" class="btn btn-dark" onclick="createReportTable()">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts_down %}
+    <script>
+        function createReportTable() {
+            let month = document.getElementById("staff_name")
+            month = month.value
+            let year = document.getElementById("choice_post")
+            year = year.value
+            window.location = `/report_table?month=${month}&year=${year}`;
+        }
+    </script>
+{% endblock %}

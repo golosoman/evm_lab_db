@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/jspdf-autotable@3.8.1/dist/jspdf.plugin.autotable.min.js"></script> -->
+
+    <script src='https://cdn.jsdelivr.net/npm/pdfmake@latest/build/pdfmake.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/pdfmake@latest/build/vfs_fonts.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-to-pdfmake/browser.js"></script>
+
+
+    <style>
+        table,
+        td,
+        th {
+            border: 2px solid;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+<button style="margin: auto;" , onclick="createPdf()">Создать PDF</button>
+<div id="table_div">
+    <h3 id="table_title" style="text-align: center;">
+        Сведения об исполненных заказах по гарантийному ремонту бытовой техники<br>
+        За такой-то месяц такого-то года
+    </h3>
+
+    <table id="table_report" style="margin: auto;border: 0px;" cellspacing="0">
+        <caption>Записи</caption>
+        <thead>
+        <tr>
+            <th scope="col">#Код заказа</th>
+            <th scope="col">ФИО клента</th>
+            <th scope="col">Телефон клиента</th>
+            <th scope="col">Дата поступления заказа</th>
+            <th scope="col">Дата исполнения заказа</th>
+            <th scope="col">Срок ремонта дней</th>
+        </tr>
+
+        </thead>
+        <tbody>
+        <!-- Сюда будут вставляться строки с ячейками -->
+        </tbody>
+    </table>
+</div>
+</body>
+<script type="text/javascript">
+    // Функция гет запроса
+    const get = async (url) => {
+        const response = await axios.get(
+            url
+        );
+        return await response.data
+    };
+
+    // !!!!Функции для ПОСТА!!!!
+    const post = async (url, dict_) => {
+        const response = await axios.post(
+            url, dict_
+        );
+        return await response.data
+    }
+
+    async function addDataInTable(table_id) {
+        data = new Proxy(new URLSearchParams(window.location.search), {get: (searchParams, prop) => searchParams.get(prop),});
+        (document.getElementById("table_title")).innerHTML = `Сведения об исполненных заказах по гарантийному ремонту бытовой техники<br>За ${data.month} месяц ${data.year} года`
+        await get(`/api/get_report?month=${data.month}&year=${data.year}`).then(res => {
+
+            let data = res
+            let table = document.getElementById(table_id);
+            console.log(data)
+
+            // Бежим по индексам даты и по ключам, вставляем соответствующие значения в таблицу
+            let i = 0;
+            let tmp = {
+                'product_name': data[0]['product_name'],
+                'brand_name': data[0]['brand_name'],
+                'model': data[0]['model']
+            };
+            let coun = 0;
+            for (let item in data) {
+                item = Number(item)
+                let date_1 = new Date(data[item]["order_execution_date"])
+                let date_2 = new Date(data[item]["order_receipt_date"])
+                let date = date_1 - date_2
+
+                table.insertRow(table.rows.length).innerHTML = `
+            <td>${data[item]["id"]}</td>
+            <td>${data[item]["client_name"]}</td>
+            <td>${data[item]["phoneNumber"]}</td>
+            <td>${data[item]["order_receipt_date"]}</td>
+            <td>${data[item]["order_execution_date"]}</td>
+            <td>${date / 86400000}</td> `
+                coun++;
+
+                let notsame = true;
+
+                try {
+                    if (data[item]['product_name'] === data[item + 1]['product_name'] && data[item]['brand_name'] === data[item + 1]['brand_name'] && data[item]['model'] === data[item + 1]['model']) {
+                        notsame = false;
+                    }
+                } catch (err) {
+                }
+
+                if (notsame) {
+                    table.insertRow(table.rows.length).innerHTML = `
+                    <td style="border: 0px;" colspan="6" ><b>Наименование товара:</b> ${data[item]["product_name"]}</td>
+                `
+
+                    table.insertRow(table.rows.length).innerHTML = `
+                    <td style="border: 0px;" colspan="6"><b>Фирма:</b> ${data[item]["brand_name"]}</td>
+                `
+
+                    table.insertRow(table.rows.length).innerHTML = `
+                    <td style="border: 0px;" colspan="6"><b>Модель:</b> ${data[item]["model"]}</td>
+                `
+                    table.insertRow(table.rows.length).innerHTML = `
+                    <td style="border: 0px;" colspan="6"><hr style="border: none; border-top: 4px dotted #000; color: #fff; background-color: #fff; height: 1px;"></td>
+                `
+                    table.insertRow(table.rows.length).innerHTML = `
+                    <td style="border: 0px;" colspan="6"><b>Итого заказов по модели:</b> ${coun}</td>
+                `
+                    table.insertRow(table.rows.length).innerHTML = `
+                    <td style="border: 0px;" colspan="6"><hr style="border: none; border-top: 2px dotted #000; color: #fff; background-color: #fff; height: 1px;"></td>
+                `
+                    coun = 0;
+                }
+            }
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
+    // Отработка функции при загрузке окна
+    window.onload = addDataInTable("table_report");
+
+    // console.log((document.getElementById("table_div")).innerHTML)
+    // let html_ = htmlToPdfmake(`${(document.getElementById("table_div")).innerHTML}`, {window:window, tableAutoSize:true})
+    // console.log(html_)
+    // let dd = {
+    //     content: html_.content
+    // }
+    // pdfMake.createPdf(dd).download();
+    function createPdf() {
+        data = new Proxy(new URLSearchParams(window.location.search), {get: (searchParams, prop) => searchParams.get(prop),});
+        var val = htmlToPdfmake(`<h3 id="table_title" style="text-align: center;">Сведения об исполненных заказах по гарантийному ремонту бытовой техники</h3>`);
+        let html_ = htmlToPdfmake(`${(document.getElementById("table_div")).innerHTML}`, {
+            window: window,
+            tableAutoSize: true
+        })
+        console.log(html_)
+        console.log(val)
+        var dd = {content: html_};
+        pdfMake.createPdf(dd).download(`Отчёт за ${data.month} месяц ${data.year} года`);
+    }
+</script>
+</html>

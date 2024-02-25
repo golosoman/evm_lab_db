@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/util.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <table class="table table-striped table-hover" id="table_orders">
+            <caption>Таблица заказов</caption>
+            <thead>
+            <tr>
+                <th scope="col">#Номер сотрудника</th>
+                <th scope="col">ФИО сотрудника</th>
+                <th scope="col">Занимаемая должность</th>
+                <th scope="col">Действие</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <!-- Сюда будут вставляться строки с ячейками -->
+
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block scripts_down %}
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/table_stuff.js') }}"></script>
+{% endblock %}
